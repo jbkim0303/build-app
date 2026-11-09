@@ -10,8 +10,11 @@ export function currentLeague(pathname: string): string {
 
 export default function Layout() {
   const { user, logout } = useAuth();
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const { pathname } = location;
   const navigate = useNavigate();
+  // On the auth pages, keep the original "return to" target; elsewhere, return here.
+  const authState = /^\/(login|register)/.test(pathname) ? location.state : { from: pathname };
   const leagues = useAsync(api.leagues, []);
   const code = currentLeague(pathname);
   const onStandings = pathname.endsWith("/standings");
@@ -36,8 +39,8 @@ export default function Layout() {
               </>
             ) : (
               <>
-                <Link to="/login" state={{ from: pathname }} className="btn btn-ghost btn-small">Log in</Link>
-                <Link to="/register" className="btn btn-small">Sign up</Link>
+                <Link to="/login" state={authState} className="btn btn-ghost btn-small">Log in</Link>
+                <Link to="/register" state={authState} className="btn btn-small">Sign up</Link>
               </>
             )}
           </div>

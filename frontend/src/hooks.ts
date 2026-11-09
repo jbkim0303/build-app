@@ -6,6 +6,13 @@ export function useAsync<T>(fn: () => Promise<T>, deps: DependencyList) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
+  const depsKey = JSON.stringify(deps);
+  const [lastKey, setLastKey] = useState(depsKey);
+  if (lastKey !== depsKey) {
+    // New inputs: drop the previous result so stale data is never shown.
+    setLastKey(depsKey);
+    setData(null);
+  }
 
   useEffect(() => {
     let alive = true;
