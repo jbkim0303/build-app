@@ -33,6 +33,16 @@ uvicorn app.main:app --reload
 ```
 
 Open http://localhost:8000/docs for the interactive Swagger UI.
+
+### Web frontend
+
+A React app lives in [`frontend/`](frontend/README.md). For development, run it next to the API:
+
+```bash
+cd frontend && npm install && npm run dev   # http://localhost:5173
+```
+
+Or build it once (`npm run build`) and the API serves the UI at http://localhost:8000/.
 On first start the database (`league.db`, SQLite) is created and seeded, along with an admin
 account `admin@league.local` / `admin1234`. Change it with `ADMIN_EMAIL` / `ADMIN_PASSWORD`.
 
@@ -95,6 +105,7 @@ app/
   seed.py        K League 1 & 2 sample data + round-robin fixture generator
   security.py    password hashing (PBKDF2) and JWT
   routers/       auth, league, bookings, admin
+frontend/        React + TypeScript web app (Vite)
 tests/           pytest suite
 ```
 
