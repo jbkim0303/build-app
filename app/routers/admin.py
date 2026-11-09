@@ -15,7 +15,8 @@ router = APIRouter(prefix="/api/admin", tags=["admin"], dependencies=[Depends(ge
 
 @router.post("/matches", response_model=MatchDetail, status_code=status.HTTP_201_CREATED)
 def create_match(body: MatchCreate, db: Session = Depends(get_db)):
-    if not db.get(League, body.league_id):
+    league = db.get(League, body.league_id)
+    if not league:
         raise HTTPException(404, "League not found")
     home, away = db.get(Team, body.home_team_id), db.get(Team, body.away_team_id)
     if not home or not away:
@@ -33,7 +34,7 @@ def create_match(body: MatchCreate, db: Session = Depends(get_db)):
     if body.zones:
         match.zones = [SeatZone(name=z.name, price=z.price, capacity=z.capacity) for z in body.zones]
     else:
-        match.zones = default_zones(home.home_stadium.capacity)
+        match.zones = default_zones(home.home_stadium.capacity, league.code)
     db.add(match)
     db.commit()
     db.refresh(match)

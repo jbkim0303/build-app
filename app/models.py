@@ -123,6 +123,10 @@ class Match(Base):
         back_populates="match", cascade="all, delete-orphan", order_by="SeatZone.price.desc()"
     )
 
+    @property
+    def league_code(self) -> str:
+        return self.league.code
+
     __table_args__ = (CheckConstraint("home_team_id != away_team_id", name="ck_distinct_teams"),)
 
 

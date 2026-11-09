@@ -1,8 +1,16 @@
 # Football League Booking API
 
 A Python (FastAPI + SQLAlchemy) backend for booking football match tickets.
-It ships with **K League 1** sample data: 12 clubs, their home stadiums, and a full
-double round-robin fixture list (22 rounds / 132 matches).
+It ships with sample data for two leagues, each with clubs, home stadiums and a full
+double round-robin fixture list:
+
+| Code | League | Clubs | Fixtures | Kickoff | Ticket prices |
+|---|---|---|---|---|---|
+| `K1` | K League 1 | 12 | 22 rounds / 132 matches | Sat 19:00 KST | VIP 60,000 / General 20,000 KRW |
+| `K2` | K League 2 | 14 | 26 rounds / 182 matches | Sun 16:30 KST | 60% of K1 (VIP 36,000 / General 12,000 KRW) |
+
+Every league endpoint takes the league code, e.g. `/api/leagues/K2/matches`. Booking references
+start with the league code (`K1-…`, `K2-…`), and one account can book across both leagues.
 
 ## Features
 
@@ -84,7 +92,7 @@ app/
   main.py        FastAPI app and startup (create tables + seed)
   models.py      SQLAlchemy models: League, Stadium, Team, Match, SeatZone, Booking, User
   schemas.py     Pydantic request and response models
-  seed.py        K League 1 sample data + round-robin fixture generator
+  seed.py        K League 1 & 2 sample data + round-robin fixture generator
   security.py    password hashing (PBKDF2) and JWT
   routers/       auth, league, bookings, admin
 tests/           pytest suite
@@ -92,5 +100,6 @@ tests/           pytest suite
 
 Run the tests with `pytest`.
 
-> The club and stadium data is sample data. Edit `TEAMS` in `app/seed.py` to match the real season.
-> To add another league (e.g. K League 2), insert a `League` with a new `code` and its teams. Every endpoint is keyed by league code.
+> The club and stadium data is sample data. Edit `K1_TEAMS` / `K2_TEAMS` in `app/seed.py` to match the real season.
+> To add another league, add a `LeagueSpec` to `LEAGUES` in `app/seed.py`. On the next start it is
+> seeded into the existing database too; leagues already there are left alone.

@@ -3,14 +3,14 @@ from datetime import datetime, timedelta, timezone
 from app.models import Match, SeatZone
 
 
-def first_upcoming(client):
-    matches = client.get("/api/leagues/K1/matches", params={"upcoming": True, "limit": 1}).json()
+def first_upcoming(client, league="K1"):
+    matches = client.get(f"/api/leagues/{league}/matches", params={"upcoming": True, "limit": 1}).json()
     return client.get(f"/api/matches/{matches[0]['id']}").json()
 
 
 def test_league_and_teams(client):
     leagues = client.get("/api/leagues").json()
-    assert leagues[0]["code"] == "K1"
+    assert [lg["code"] for lg in leagues] == ["K1", "K2"]
     teams = client.get("/api/leagues/k1/teams").json()
     assert len(teams) == 12
     assert client.get("/api/leagues/XX/teams").status_code == 404
@@ -120,3 +120,61 @@ def test_admin_create_match_and_cancel(client, user_headers, admin_headers):
     # No result can be recorded for a future match.
     assert client.post(f"/api/admin/matches/{match['id']}/result", json={"home_score": 1, "away_score": 0},
                        headers=admin_headers).status_code == 409
+
+
+# ---------- K League 2 ----------
+def test_k2_teams_and_fixtures(client):
+    teams = client.get("/api/leagues/K2/teams").json()
+    assert len(teams) == 14
+    k1_ids = {t["id"] for t in client.get("/api/leagues/K1/teams").json()}
+    assert not k1_ids & {t["id"] for t in teams}
+
+    matches = client.get("/api/leagues/K2/matches", params={"limit": 500}).json()
+    assert len(matches) == 14 * 13
+    assert {m["round"] for m in matches} == set(range(1, 27))
+    assert all(m["league_code"] == "K2" for m in matches)
+    team_ids = {t["id"] for t in teams}
+    assert all(m["home_team"]["id"] in team_ids and m["away_team"]["id"] in team_ids for m in matches)
+
+
+def test_k2_standings(client):
+    rows = client.get("/api/leagues/K2/standings").json()
+    assert len(rows) == 14
+    assert all(r["played"] == 3 for r in rows)
+
+
+def test_k2_booking(client, user_headers):
+    k1_zone = first_upcoming(client, "K1")["zones"][0]
+    match = first_upcoming(client, "K2")
+    zone = match["zones"][0]
+    assert zone["name"] == k1_zone["name"] == "VIP"
+    assert zone["price"] < k1_zone["price"]  # second division is cheaper
+
+    r = client.post("/api/bookings", json={"zone_id": zone["id"], "quantity": 2}, headers=user_headers)
+    assert r.status_code == 201, r.text
+    booking = r.json()
+    assert booking["reference"].startswith("K2-")
+    assert booking["match"]["league_code"] == "K2"
+    assert booking["total_price"] == zone["price"] * 2
+
+    # One account can hold bookings in both leagues.
+    client.post("/api/bookings", json={"zone_id": k1_zone["id"], "quantity": 1}, headers=user_headers)
+    codes = {b["match"]["league_code"] for b in client.get("/api/bookings", headers=user_headers).json()}
+    assert codes == {"K1", "K2"}
+
+
+def test_admin_k2_match_rules(client, admin_headers):
+    leagues = {lg["code"]: lg["id"] for lg in client.get("/api/leagues").json()}
+    k1 = client.get("/api/leagues/K1/teams").json()
+    k2 = client.get("/api/leagues/K2/teams").json()
+    kickoff = (datetime.now(timezone.utc) + timedelta(days=30)).isoformat()
+
+    mixed = {"league_id": leagues["K2"], "round": 27, "home_team_id": k2[0]["id"],
+             "away_team_id": k1[0]["id"], "kickoff": kickoff}
+    assert client.post("/api/admin/matches", json=mixed, headers=admin_headers).status_code == 422
+
+    ok = {**mixed, "away_team_id": k2[1]["id"]}
+    r = client.post("/api/admin/matches", json=ok, headers=admin_headers)
+    assert r.status_code == 201, r.text
+    prices = {z["name"]: z["price"] for z in r.json()["zones"]}
+    assert prices["VIP"] == 36000  # 60,000 x 0.6 K2 price factor

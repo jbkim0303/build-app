@@ -76,6 +76,7 @@ class SeatZoneOut(ORM):
 
 class MatchOut(ORM):
     id: int
+    league_code: str
     round: int
     kickoff: datetime
     status: MatchStatus
