@@ -103,3 +103,15 @@ Run the tests with `pytest`.
 > The club and stadium data is sample data. Edit `K1_TEAMS` / `K2_TEAMS` in `app/seed.py` to match the real season.
 > To add another league, add a `LeagueSpec` to `LEAGUES` in `app/seed.py`. On the next start it is
 > seeded into the existing database too; leagues already there are left alone.
+
+## Neo4j CSV upload tool
+
+`neo4j_loader/` is a separate command-line tool that uploads CSV files into Neo4j as nodes and
+relationships. It includes a sample K League graph (`neo4j_loader/examples/`):
+
+```bash
+pip install -r neo4j_loader/requirements.txt
+NEO4J_PASSWORD=secret python -m neo4j_loader load neo4j_loader/examples/k_league.yaml
+```
+
+See [neo4j_loader/README.md](neo4j_loader/README.md).

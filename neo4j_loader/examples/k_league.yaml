@@ -1,0 +1,80 @@
+# K League sample graph:
+#   (:Team)-[:PLAYS_IN]->(:League)
+#   (:Team)-[:HOME_GROUND]->(:Stadium)
+#   (:Team)-[:HOME_IN|AWAY_IN]->(:Match)-[:PART_OF]->(:League)
+#
+#   python -m neo4j_loader load neo4j_loader/examples/k_league.yaml
+
+defaults:
+  data_dir: data          # CSV paths are relative to this folder (itself relative to this file)
+  batch_size: 500
+  # delimiter: ","
+  # encoding: utf-8-sig
+  # list_separator: ";"
+  # on_error: fail        # or "skip" to log bad rows and keep going
+
+nodes:
+  - file: leagues.csv
+    label: League
+    key: code
+    properties:
+      code: str
+      name: str
+      tier: int
+      country: str
+
+  - file: stadiums.csv
+    label: Stadium
+    key: name
+    properties: {name: str, city: str, capacity: int}
+
+  - file: teams.csv
+    label: Team
+    labels: [Club]              # extra labels
+    key: code
+    properties:
+      code: str
+      name: str
+      city: str
+      colors: list              # "blue;white" -> ["blue", "white"]
+
+  - file: matches.csv
+    label: Match
+    key: id
+    properties:
+      id: {column: match_id}    # rename: CSV column match_id -> property id
+      round: int
+      kickoff: datetime         # ISO 8601 -> Neo4j DateTime
+      home_goals: int           # empty cells are left unset (match not played yet)
+      away_goals: int
+      attendance: int
+
+relationships:
+  - file: teams.csv
+    type: PLAYS_IN
+    from: {label: Team, key: code}                          # column "code"
+    to: {label: League, key: code, column: league_code}
+
+  - file: teams.csv
+    type: HOME_GROUND
+    from: {label: Team, key: code}
+    to: {label: Stadium, key: name, column: stadium}
+
+  - file: matches.csv
+    type: PART_OF
+    from: {label: Match, key: id, column: match_id}
+    to: {label: League, key: code, column: league_code}
+
+  - file: matches.csv
+    type: HOME_IN
+    from: {label: Team, key: code, column: home_code}
+    to: {label: Match, key: id, column: match_id}
+    properties:
+      goals: {column: home_goals, type: int}
+
+  - file: matches.csv
+    type: AWAY_IN
+    from: {label: Team, key: code, column: away_code}
+    to: {label: Match, key: id, column: match_id}
+    properties:
+      goals: {column: away_goals, type: int}

@@ -1,0 +1,27 @@
+code,name,city,league_code,stadium,colors
+ULS,Ulsan HD FC,Ulsan,K1,Ulsan Munsu Football Stadium,blue;white
+JEO,Jeonbuk Hyundai Motors,Jeonju,K1,Jeonju World Cup Stadium,green;white
+POH,Pohang Steelers,Pohang,K1,Pohang Steelyard,red;black
+SEO,FC Seoul,Seoul,K1,Seoul World Cup Stadium,red;black
+GAN,Gangwon FC,Gangneung,K1,Gangneung Stadium,orange;white
+GIM,Gimcheon Sangmu,Gimcheon,K1,Gimcheon Stadium,red;white
+SUW,Suwon FC,Suwon,K1,Suwon Sports Complex,red;blue
+JEJ,Jeju SK FC,Seogwipo,K1,Jeju World Cup Stadium,orange;white
+DAE,Daejeon Hana Citizen,Daejeon,K1,Daejeon World Cup Stadium,purple;green
+GWA,Gwangju FC,Gwangju,K1,Gwangju Football Stadium,yellow;red
+ANY,FC Anyang,Anyang,K1,Anyang Stadium,purple;white
+INC,Incheon United,Incheon,K1,Incheon Football Stadium,blue;black
+SSB,Suwon Samsung Bluewings,Suwon,K2,Suwon World Cup Stadium,blue;white
+BUS,Busan IPark,Busan,K2,Busan Gudeok Stadium,green;white
+JND,Jeonnam Dragons,Gwangyang,K2,Gwangyang Football Stadium,red;black
+BUC,Bucheon FC 1995,Bucheon,K2,Bucheon Stadium,red;black
+SEL,Seoul E-Land FC,Seoul,K2,Mokdong Stadium,orange;white
+SNG,Seongnam FC,Seongnam,K2,Tancheon Stadium,red;white
+GYE,Gyeongnam FC,Changwon,K2,Changwon Football Center,red;blue
+ASA,Chungnam Asan FC,Asan,K2,Yi Sun-sin Stadium,orange;white
+ANS,Ansan Greeners,Ansan,K2,Ansan Wa~ Stadium,purple;green
+GMP,Gimpo FC,Gimpo,K2,Gimpo Solteo Football Stadium,yellow;red
+CHE,Chungbuk Cheongju FC,Cheongju,K2,Cheongju Stadium,purple;white
+CHN,Cheonan City FC,Cheonan,K2,Cheonan Stadium,blue;black
+HWA,Hwaseong FC,Hwaseong,K2,Hwaseong Stadium,blue;white
+DGU,Daegu FC,Daegu,K2,DGB Daegu Bank Park,green;white
